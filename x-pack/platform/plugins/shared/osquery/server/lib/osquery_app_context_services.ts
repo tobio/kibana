@@ -25,10 +25,13 @@ import type { RuleRegistryPluginStartContract } from '@kbn/rule-registry-plugin/
 import type { LicensingPluginSetup } from '@kbn/licensing-plugin/server';
 import type { FleetActionsClientInterface } from '@kbn/fleet-plugin/server/services/actions';
 import type { Space, SpacesServiceStart } from '@kbn/spaces-plugin/server';
+import { SavedObjectsErrorHelpers } from '@kbn/core/server';
+import { DEFAULT_SPACE_ID } from '@kbn/core-spaces-common';
 import type { ConfigType } from '../../common/config';
 import type { ExperimentalFeatures } from '../../common';
 import type { TelemetryEventsSender } from './telemetry/sender';
 import { getIntegrationNamespaces } from '../utils/get_integration_namespaces';
+import { SpaceNotFoundError } from '../utils/space_not_found_error';
 
 export type OsqueryAppContextServiceStartContract = Partial<
   Pick<
@@ -96,8 +99,20 @@ export class OsqueryAppContextService {
     return this.fleetActionsClient;
   }
 
-  public getActiveSpace(httpRequest: KibanaRequest): Promise<Space> | undefined {
-    return this.spacesService?.getActiveSpace(httpRequest);
+  public async getActiveSpace(httpRequest: KibanaRequest): Promise<Space | undefined> {
+    try {
+      return await this.spacesService?.getActiveSpace(httpRequest);
+    } catch (err) {
+      if (SavedObjectsErrorHelpers.isNotFoundError(err)) {
+        throw new SpaceNotFoundError(this.getSpaceId(httpRequest) ?? DEFAULT_SPACE_ID);
+      }
+
+      throw err;
+    }
+  }
+
+  public getSpaceId(httpRequest: KibanaRequest): string | undefined {
+    return this.spacesService?.getSpaceId(httpRequest);
   }
 
   /**

@@ -10,6 +10,7 @@ import { LEGACY_AGENT_POLICY_SAVED_OBJECT_TYPE } from '@kbn/fleet-plugin/common'
 import { type IRouter, SavedObjectsErrorHelpers } from '@kbn/core/server';
 
 import { createInternalSavedObjectsClientForSpaceId } from '../../utils/get_internal_saved_object_client';
+import { withMissingSpaceHandler } from '../utils/with_missing_space_handler';
 import type { ReadPacksRequestParamsSchema } from '../../../common/api';
 import { buildRouteValidation } from '../../utils/build_validation/route_validation';
 import { API_VERSIONS } from '../../../common/constants';
@@ -56,7 +57,7 @@ export const readPackRoute = (router: IRouter, osqueryContext: OsqueryAppContext
           },
         },
       },
-      async (context, request, response) => {
+      withMissingSpaceHandler(async (context, request, response) => {
         const spaceScopedClient = await createInternalSavedObjectsClientForSpaceId(
           osqueryContext,
           request
@@ -126,6 +127,6 @@ export const readPackRoute = (router: IRouter, osqueryContext: OsqueryAppContext
             data,
           },
         });
-      }
+      })
     );
 };

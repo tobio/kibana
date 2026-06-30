@@ -29,6 +29,7 @@ import type {
 } from '../../../common/search_strategy';
 import { generateTablePaginationOptions } from '../../../common/utils/build_query';
 import { createInternalSavedObjectsClientForSpaceId } from '../../utils/get_internal_saved_object_client';
+import { withMissingSpaceHandler } from '../utils/with_missing_space_handler';
 import { actionResultsResponseSchema } from './response_schemas';
 
 export const getActionResultsRoute = (
@@ -66,7 +67,7 @@ export const getActionResultsRoute = (
           },
         },
       },
-      async (context, request, response) => {
+      withMissingSpaceHandler(async (context, request, response) => {
         const abortSignal = getRequestAbortedSignal(request.events.aborted$);
 
         try {
@@ -169,6 +170,6 @@ export const getActionResultsRoute = (
             body: { message: error.message },
           });
         }
-      }
+      })
     );
 };

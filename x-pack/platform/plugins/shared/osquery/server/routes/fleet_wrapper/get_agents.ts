@@ -14,6 +14,7 @@ import { satisfies } from 'semver';
 import type { SortResults } from '@elastic/elasticsearch/lib/api/types';
 import { DEFAULT_SPACE_ID } from '@kbn/core-spaces-common';
 import { createInternalSavedObjectsClientForSpaceId } from '../../utils/get_internal_saved_object_client';
+import { withMissingSpaceHandler } from '../utils/with_missing_space_handler';
 import { processAggregations } from '../../../common/utils/aggregations';
 import { getAgentsRequestQuerySchema } from '../../../common/api';
 import type { GetAgentsRequestQuerySchema } from '../../../common/api';
@@ -45,7 +46,7 @@ export const getAgentsRoute = (router: IRouter, osqueryContext: OsqueryAppContex
           },
         },
       },
-      async (context, request, response) => {
+      withMissingSpaceHandler(async (context, request, response) => {
         let esAgents;
         const query = request.query as ListWithKuery & {
           showAgentless?: boolean;
@@ -152,6 +153,6 @@ export const getAgentsRoute = (router: IRouter, osqueryContext: OsqueryAppContex
             agents: esAgents?.agents ?? [],
           },
         });
-      }
+      })
     );
 };

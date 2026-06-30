@@ -31,6 +31,7 @@ import {
 } from '../../../common/api';
 import type { OsqueryAppContext } from '../../lib/osquery_app_context_services';
 import { getLiveQueryDetailsResponseSchema } from './response_schemas';
+import { withMissingSpaceHandler } from '../utils/with_missing_space_handler';
 
 export const getLiveQueryDetailsRoute = (
   router: IRouter<DataRequestHandlerContext>,
@@ -67,7 +68,7 @@ export const getLiveQueryDetailsRoute = (
           },
         },
       },
-      async (context, request, response) => {
+      withMissingSpaceHandler(async (context, request, response) => {
         const abortSignal = getRequestAbortedSignal(request.events.aborted$);
 
         try {
@@ -165,7 +166,7 @@ export const getLiveQueryDetailsRoute = (
             },
           });
         }
-      }
+      })
     );
 };
 

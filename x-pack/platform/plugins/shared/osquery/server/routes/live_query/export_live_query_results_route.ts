@@ -21,6 +21,7 @@ import type {
 import { OsqueryQueries } from '../../../common/search_strategy';
 import type { OsqueryAppContext } from '../../lib/osquery_app_context_services';
 import { createExportRouteHandler } from '../export/create_export_route_handler';
+import { withMissingSpaceHandler } from '../utils/with_missing_space_handler';
 import {
   exportLiveQueryParamsSchema,
   exportQuerySchema,
@@ -54,7 +55,7 @@ export const exportLiveQueryResultsRoute = (
           },
         },
       },
-      async (context, request, response) => {
+      withMissingSpaceHandler(async (context, request, response) => {
         const { id, actionId } = request.params;
 
         const spaceId = osqueryContext?.service?.getActiveSpace
@@ -114,6 +115,6 @@ export const exportLiveQueryResultsRoute = (
           fileNamePrefix: `osquery-results-${actionId}`,
           ecsMapping,
         });
-      }
+      })
     );
 };

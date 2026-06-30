@@ -16,6 +16,7 @@ import { API_VERSIONS, ACTIONS_INDEX } from '../../../common/constants';
 import { PLUGIN_ID } from '../../../common';
 import { buildRouteValidation } from '../../utils/build_validation/route_validation';
 import { buildSpaceIdFilter } from '../../utils/build_space_id_filter';
+import { withMissingSpaceHandler } from '../utils/with_missing_space_handler';
 
 const USERS_PAGE_SIZE = 10;
 
@@ -60,7 +61,7 @@ export const getHistoryUsersRoute = (
           },
         },
       },
-      async (context, request, response) => {
+      withMissingSpaceHandler(async (context, request, response) => {
         try {
           const [coreStartServices] = await osqueryContext.getStartServices();
           const esClient = coreStartServices.elasticsearch.client.asInternalUser;
@@ -128,6 +129,6 @@ export const getHistoryUsersRoute = (
             body: { message: 'Failed to fetch history users' },
           });
         }
-      }
+      })
     );
 };

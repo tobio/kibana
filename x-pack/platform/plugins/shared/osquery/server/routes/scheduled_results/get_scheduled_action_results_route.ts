@@ -22,6 +22,7 @@ import { Direction, OsqueryQueries } from '../../../common/search_strategy';
 import { generateTablePaginationOptions } from '../../../common/utils/build_query';
 import type { OsqueryAppContext } from '../../lib/osquery_app_context_services';
 import type { PackSavedObject } from '../../common/types';
+import { withMissingSpaceHandler } from '../utils/with_missing_space_handler';
 
 interface ScheduledActionResultsAggregations {
   aggs: {
@@ -74,7 +75,7 @@ export const getScheduledActionResultsRoute = (
           },
         },
       },
-      async (context, request, response) => {
+      withMissingSpaceHandler(async (context, request, response) => {
         const abortSignal = getRequestAbortedSignal(request.events.aborted$);
 
         try {
@@ -194,6 +195,6 @@ export const getScheduledActionResultsRoute = (
             body: { message: e.message },
           });
         }
-      }
+      })
     );
 };

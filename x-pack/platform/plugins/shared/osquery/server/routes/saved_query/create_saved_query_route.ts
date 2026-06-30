@@ -8,6 +8,7 @@
 import { isEmpty, pickBy, some, isBoolean, isNumber } from 'lodash';
 import type { IRouter } from '@kbn/core/server';
 import { createInternalSavedObjectsClientForSpaceId } from '../../utils/get_internal_saved_object_client';
+import { withMissingSpaceHandler } from '../utils/with_missing_space_handler';
 import type { CreateSavedQueryRequestSchemaDecoded } from '../../../common/api';
 import { API_VERSIONS } from '../../../common/constants';
 import type { SavedQueryResponse } from './types';
@@ -50,7 +51,7 @@ export const createSavedQueryRoute = (router: IRouter, osqueryContext: OsqueryAp
           },
         },
       },
-      async (context, request, response) => {
+      withMissingSpaceHandler(async (context, request, response) => {
         const spaceScopedClient = await createInternalSavedObjectsClientForSpaceId(
           osqueryContext,
           request
@@ -145,6 +146,6 @@ export const createSavedQueryRoute = (router: IRouter, osqueryContext: OsqueryAp
             data,
           },
         });
-      }
+      })
     );
 };

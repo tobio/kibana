@@ -17,6 +17,7 @@ import { readSavedQueryRequestParamsSchema } from '../../../common/api/saved_que
 import { prepareSavedObjectCopy } from '../utils/copy_saved_object';
 import type { CopySavedQueryResponseData } from './types';
 import { copySavedQueryResponseSchema } from './response_schemas';
+import { withMissingSpaceHandler } from '../utils/with_missing_space_handler';
 
 export const copySavedQueryRoute = (router: IRouter, osqueryContext: OsqueryAppContext) => {
   router.versioned
@@ -46,7 +47,7 @@ export const copySavedQueryRoute = (router: IRouter, osqueryContext: OsqueryAppC
           },
         },
       },
-      async (context, request, response) => {
+      withMissingSpaceHandler(async (context, request, response) => {
         const logger = osqueryContext.logFactory.get('savedQuery');
 
         try {
@@ -125,6 +126,6 @@ export const copySavedQueryRoute = (router: IRouter, osqueryContext: OsqueryAppC
             },
           });
         }
-      }
+      })
     );
 };

@@ -12,6 +12,7 @@ import { DEFAULT_SPACE_ID } from '@kbn/core-spaces-common';
 import { API_VERSIONS } from '../../../common/constants';
 import { PLUGIN_ID } from '../../../common';
 import type { OsqueryAppContext } from '../../lib/osquery_app_context_services';
+import { withMissingSpaceHandler } from '../utils/with_missing_space_handler';
 
 /**
  * Request body schema for bulk agent details endpoint.
@@ -41,7 +42,7 @@ export const getBulkAgentDetailsRoute = (router: IRouter, osqueryContext: Osquer
           },
         },
       },
-      async (context, request, response) => {
+      withMissingSpaceHandler(async (context, request, response) => {
         const logger = osqueryContext.logFactory.get('bulkAgentDetails');
         const space = await osqueryContext.service.getActiveSpace(request);
 
@@ -75,6 +76,6 @@ export const getBulkAgentDetailsRoute = (router: IRouter, osqueryContext: Osquer
             },
           });
         }
-      }
+      })
     );
 };

@@ -8,6 +8,7 @@
 import { type IRouter, SavedObjectsErrorHelpers } from '@kbn/core/server';
 import { DEFAULT_SPACE_ID } from '@kbn/core-spaces-common';
 import { createInternalSavedObjectsClientForSpaceId } from '../../utils/get_internal_saved_object_client';
+import { withMissingSpaceHandler } from '../utils/with_missing_space_handler';
 import { buildRouteValidation } from '../../utils/build_validation/route_validation';
 import { API_VERSIONS } from '../../../common/constants';
 import { PLUGIN_ID } from '../../../common';
@@ -46,7 +47,7 @@ export const deleteSavedQueryRoute = (router: IRouter, osqueryContext: OsqueryAp
           },
         },
       },
-      async (context, request, response) => {
+      withMissingSpaceHandler(async (context, request, response) => {
         const spaceScopedClient = await createInternalSavedObjectsClientForSpaceId(
           osqueryContext,
           request
@@ -82,6 +83,6 @@ export const deleteSavedQueryRoute = (router: IRouter, osqueryContext: OsqueryAp
         return response.ok({
           body: {},
         });
-      }
+      })
     );
 };

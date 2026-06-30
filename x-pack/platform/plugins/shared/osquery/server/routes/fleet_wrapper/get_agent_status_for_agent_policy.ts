@@ -16,6 +16,7 @@ import { buildRouteValidation } from '../../utils/build_validation/route_validat
 import { API_VERSIONS } from '../../../common/constants';
 import { PLUGIN_ID } from '../../../common';
 import type { OsqueryAppContext } from '../../lib/osquery_app_context_services';
+import { withMissingSpaceHandler } from '../utils/with_missing_space_handler';
 import {
   getAgentStatusForAgentPolicyRequestParamsSchema,
   getAgentStatusForAgentPolicyRequestQuerySchema,
@@ -51,7 +52,7 @@ export const getAgentStatusForAgentPolicyRoute = (
           },
         },
       },
-      async (context, request, response) => {
+      withMissingSpaceHandler(async (context, request, response) => {
         const space = await osqueryContext.service.getActiveSpace(request);
         const results = await osqueryContext.service
           .getAgentService()
@@ -65,6 +66,6 @@ export const getAgentStatusForAgentPolicyRoute = (
         const body: GetAgentStatusResponse = { results };
 
         return response.ok({ body });
-      }
+      })
     );
 };

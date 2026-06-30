@@ -21,6 +21,7 @@ import {
   exportScheduledQueryParamsSchema,
 } from '../export/export_request_body_schema';
 import { createInternalSavedObjectsClientForSpaceId } from '../../utils/get_internal_saved_object_client';
+import { withMissingSpaceHandler } from '../utils/with_missing_space_handler';
 import { getPacksForSpace } from '../unified_history/process_scheduled_history';
 import { buildPackLookup } from '../unified_history/pack_lookup';
 
@@ -51,7 +52,7 @@ export const exportScheduledQueryResultsRoute = (
           },
         },
       },
-      async (context, request, response) => {
+      withMissingSpaceHandler(async (context, request, response) => {
         const { scheduleId, executionCount } = request.params;
 
         let query: string | undefined;
@@ -103,6 +104,6 @@ export const exportScheduledQueryResultsRoute = (
           fileNamePrefix: `osquery-scheduled-results-${scheduleId}-${executionCount}`,
           ecsMapping,
         });
-      }
+      })
     );
 };

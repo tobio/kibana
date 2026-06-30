@@ -12,6 +12,7 @@ import { API_VERSIONS } from '../../../common/constants';
 import { PLUGIN_ID } from '../../../common';
 import type { OsqueryAppContext } from '../../lib/osquery_app_context_services';
 import { GetAgentDetailsRequestParams } from '../../../common/api';
+import { withMissingSpaceHandler } from '../utils/with_missing_space_handler';
 
 export const getAgentDetailsRoute = (router: IRouter, osqueryContext: OsqueryAppContext) => {
   router.versioned
@@ -33,7 +34,7 @@ export const getAgentDetailsRoute = (router: IRouter, osqueryContext: OsqueryApp
           },
         },
       },
-      async (context, request, response) => {
+      withMissingSpaceHandler(async (context, request, response) => {
         const space = await osqueryContext.service.getActiveSpace(request);
 
         let agent;
@@ -48,6 +49,6 @@ export const getAgentDetailsRoute = (router: IRouter, osqueryContext: OsqueryApp
         }
 
         return response.ok({ body: { item: agent } });
-      }
+      })
     );
 };

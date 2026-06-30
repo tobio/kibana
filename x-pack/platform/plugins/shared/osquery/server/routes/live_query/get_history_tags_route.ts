@@ -13,6 +13,7 @@ import type { OsqueryAppContext } from '../../lib/osquery_app_context_services';
 import { API_VERSIONS, ACTIONS_INDEX } from '../../../common/constants';
 import { PLUGIN_ID } from '../../../common';
 import { buildSpaceIdFilter } from '../../utils/build_space_id_filter';
+import { withMissingSpaceHandler } from '../utils/with_missing_space_handler';
 
 // Max unique tags returned by the aggregation; results beyond this are truncated
 const TAGS_AGG_SIZE = 200;
@@ -42,7 +43,7 @@ export const getHistoryTagsRoute = (
         version: API_VERSIONS.internal.v1,
         validate: {},
       },
-      async (_, request, response) => {
+      withMissingSpaceHandler(async (_, request, response) => {
         try {
           const [coreStartServices] = await osqueryContext.getStartServices();
           const esClient = coreStartServices.elasticsearch.client.asInternalUser;
@@ -94,6 +95,6 @@ export const getHistoryTagsRoute = (
             body: { message: 'Failed to fetch history tags' },
           });
         }
-      }
+      })
     );
 };

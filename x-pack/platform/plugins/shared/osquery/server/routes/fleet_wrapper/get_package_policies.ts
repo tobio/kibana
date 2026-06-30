@@ -8,6 +8,7 @@
 import type { IRouter } from '@kbn/core/server';
 import { PACKAGE_POLICY_SAVED_OBJECT_TYPE } from '@kbn/fleet-plugin/common';
 import { createInternalSavedObjectsClientForSpaceId } from '../../utils/get_internal_saved_object_client';
+import { withMissingSpaceHandler } from '../utils/with_missing_space_handler';
 import { API_VERSIONS } from '../../../common/constants';
 import { PLUGIN_ID, OSQUERY_INTEGRATION_NAME } from '../../../common';
 import type { OsqueryAppContext } from '../../lib/osquery_app_context_services';
@@ -28,7 +29,7 @@ export const getPackagePoliciesRoute = (router: IRouter, osqueryContext: Osquery
         version: API_VERSIONS.internal.v1,
         validate: {},
       },
-      async (context, request, response) => {
+      withMissingSpaceHandler(async (context, request, response) => {
         const spaceScopedClient = await createInternalSavedObjectsClientForSpaceId(
           osqueryContext,
           request
@@ -44,6 +45,6 @@ export const getPackagePoliciesRoute = (router: IRouter, osqueryContext: Osquery
         return response.ok({
           body: policies,
         });
-      }
+      })
     );
 };

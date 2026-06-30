@@ -22,6 +22,7 @@ import { PLUGIN_ID } from '../../../common';
 import { buildRouteValidation } from '../../utils/build_validation/route_validation';
 import { buildSpaceIdFilter } from '../../utils/build_space_id_filter';
 import { updateActionTagsResponseSchema } from './response_schemas';
+import { withMissingSpaceHandler } from '../utils/with_missing_space_handler';
 
 const updateActionTagsRequestParamsSchema = t.type({
   id: t.string,
@@ -71,7 +72,7 @@ export const updateActionTagsRoute = (
           },
         },
       },
-      async (_, request, response) => {
+      withMissingSpaceHandler(async (_, request, response) => {
         try {
           const tags = [...new Set(request.body.tags)];
 
@@ -174,6 +175,6 @@ export const updateActionTagsRoute = (
             body: { message: e.message },
           });
         }
-      }
+      })
     );
 };

@@ -17,6 +17,7 @@ import { buildRouteValidation } from '../../utils/build_validation/route_validat
 import { API_VERSIONS, OSQUERY_INTEGRATION_NAME } from '../../../common/constants';
 import { PLUGIN_ID } from '../../../common';
 import { createInternalSavedObjectsClientForSpaceId } from '../../utils/get_internal_saved_object_client';
+import { withMissingSpaceHandler } from '../utils/with_missing_space_handler';
 
 import type {
   ActionDetails,
@@ -63,7 +64,7 @@ export const findLiveQueryRoute = (
           },
         },
       },
-      async (context, request, response) => {
+      withMissingSpaceHandler(async (context, request, response) => {
         const abortSignal = getRequestAbortedSignal(request.events.aborted$);
 
         try {
@@ -219,7 +220,7 @@ export const findLiveQueryRoute = (
             },
           });
         }
-      }
+      })
     );
 };
 

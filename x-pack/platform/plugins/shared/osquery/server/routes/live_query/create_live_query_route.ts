@@ -25,6 +25,7 @@ import { parser as OsqueryParser } from './osquery_parser';
 import { getUserInfo } from '../../lib/get_user_info';
 import { isOsqueryResponseActionAuthorized } from '../../lib/check_response_action_authz';
 import { createLiveQueryResponseSchema } from './response_schemas';
+import { withMissingSpaceHandler } from '../utils/with_missing_space_handler';
 
 export const createLiveQueryRoute = (router: IRouter, osqueryContext: OsqueryAppContext) => {
   router.versioned
@@ -56,7 +57,7 @@ export const createLiveQueryRoute = (router: IRouter, osqueryContext: OsqueryApp
           },
         },
       },
-      async (context, request, response) => {
+      withMissingSpaceHandler(async (context, request, response) => {
         const [coreStartServices, startPlugins] = await osqueryContext.getStartServices();
 
         const isInvalid = !(await isOsqueryResponseActionAuthorized(coreStartServices, request, {
@@ -152,6 +153,6 @@ export const createLiveQueryRoute = (router: IRouter, osqueryContext: OsqueryApp
             body: new Error(`Error occurred while processing ${error}`),
           });
         }
-      }
+      })
     );
 };

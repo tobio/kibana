@@ -21,6 +21,7 @@ import { packSavedObjectType } from '../../../common/types';
 import type { OsqueryAppContext } from '../../lib/osquery_app_context_services';
 import { deletePacksRequestParamsSchema } from '../../../common/api';
 import { createInternalSavedObjectsClientForSpaceId } from '../../utils/get_internal_saved_object_client';
+import { withMissingSpaceHandler } from '../utils/with_missing_space_handler';
 import { policyHasPack, removePackFromPolicy } from './utils';
 import { deletePackResponseSchema } from './response_schemas';
 
@@ -52,7 +53,7 @@ export const deletePackRoute = (router: IRouter, osqueryContext: OsqueryAppConte
           },
         },
       },
-      async (context, request, response) => {
+      withMissingSpaceHandler(async (context, request, response) => {
         const coreContext = await context.core;
         const esClient = coreContext.elasticsearch.client.asCurrentUser;
         const spaceScopedClient = await createInternalSavedObjectsClientForSpaceId(
@@ -114,6 +115,6 @@ export const deletePackRoute = (router: IRouter, osqueryContext: OsqueryAppConte
         return response.ok({
           body: {},
         });
-      }
+      })
     );
 };

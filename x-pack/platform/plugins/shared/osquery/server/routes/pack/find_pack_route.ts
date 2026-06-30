@@ -12,6 +12,7 @@ import type { IRouter } from '@kbn/core/server';
 
 import { escapeQuotes } from '@kbn/es-query';
 import { createInternalSavedObjectsClientForSpaceId } from '../../utils/get_internal_saved_object_client';
+import { withMissingSpaceHandler } from '../utils/with_missing_space_handler';
 import type { FindPacksRequestQuerySchema } from '../../../common/api';
 import { buildRouteValidation } from '../../utils/build_validation/route_validation';
 import { API_VERSIONS } from '../../../common/constants';
@@ -52,7 +53,7 @@ export const findPackRoute = (router: IRouter, osqueryContext: OsqueryAppContext
           },
         },
       },
-      async (context, request, response) => {
+      withMissingSpaceHandler(async (context, request, response) => {
         const spaceScopedClient = await createInternalSavedObjectsClientForSpaceId(
           osqueryContext,
           request
@@ -128,6 +129,6 @@ export const findPackRoute = (router: IRouter, osqueryContext: OsqueryAppContext
             data: packSavedObjects,
           },
         });
-      }
+      })
     );
 };

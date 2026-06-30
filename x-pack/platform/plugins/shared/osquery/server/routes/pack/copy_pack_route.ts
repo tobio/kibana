@@ -20,6 +20,7 @@ import { prepareSavedObjectCopy } from '../utils/copy_saved_object';
 import type { PackResponseData } from './types';
 import { buildScheduleResponseSlice, stripPerQueryRruleFields } from './utils';
 import { copyPackResponseSchema } from './response_schemas';
+import { withMissingSpaceHandler } from '../utils/with_missing_space_handler';
 
 // Fields that are intentionally NOT copied — they are pack-instance metadata
 // or assignments that must be regenerated for the new pack. Pack-level
@@ -55,7 +56,7 @@ export const copyPackRoute = (router: IRouter, osqueryContext: OsqueryAppContext
           },
         },
       },
-      async (context, request, response) => {
+      withMissingSpaceHandler(async (context, request, response) => {
         const logger = osqueryContext.logFactory.get('pack');
 
         try {
@@ -184,6 +185,6 @@ export const copyPackRoute = (router: IRouter, osqueryContext: OsqueryAppContext
             },
           });
         }
-      }
+      })
     );
 };

@@ -7,6 +7,7 @@
 
 import type { IRouter } from '@kbn/core/server';
 import { createInternalSavedObjectsClientForSpaceId } from '../utils/get_internal_saved_object_client';
+import { withMissingSpaceHandler } from './utils/with_missing_space_handler';
 import { API_VERSIONS } from '../../common/constants';
 import { PLUGIN_ID } from '../../common';
 import { packSavedObjectType, savedQuerySavedObjectType } from '../../common/types';
@@ -39,7 +40,7 @@ const getUsersRoute = (
         version: API_VERSIONS.internal.v1,
         validate: {},
       },
-      async (_, request, response) => {
+      withMissingSpaceHandler(async (_, request, response) => {
         try {
           const spaceScopedClient = await createInternalSavedObjectsClientForSpaceId(
             osqueryContext,
@@ -78,7 +79,7 @@ const getUsersRoute = (
             body: { message: 'Failed to fetch users' },
           });
         }
-      }
+      })
     );
 };
 

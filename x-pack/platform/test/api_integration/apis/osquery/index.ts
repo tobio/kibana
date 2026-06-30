@@ -22,5 +22,6 @@ export default function ({ loadTestFile }: FtrProviderContext) {
     loadTestFile(require.resolve('./scheduled_results_space_scoping'));
     loadTestFile(require.resolve('./action_results_space_scoping'));
     loadTestFile(require.resolve('./export_results'));
+    loadTestFile(require.resolve('./non_existent_space'));
   });
 }

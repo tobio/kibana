@@ -10,6 +10,7 @@ import type { IRouter } from '@kbn/core/server';
 import { escapeQuotes, escapeKuery } from '@kbn/es-query';
 import { DEFAULT_SPACE_ID } from '@kbn/core-spaces-common';
 import { createInternalSavedObjectsClientForSpaceId } from '../../utils/get_internal_saved_object_client';
+import { withMissingSpaceHandler } from '../utils/with_missing_space_handler';
 import { buildRouteValidation } from '../../utils/build_validation/route_validation';
 import { API_VERSIONS } from '../../../common/constants';
 import type { SavedQueryResponse } from './types';
@@ -51,7 +52,7 @@ export const findSavedQueryRoute = (router: IRouter, osqueryContext: OsqueryAppC
           },
         },
       },
-      async (context, request, response) => {
+      withMissingSpaceHandler(async (context, request, response) => {
         const spaceScopedClient = await createInternalSavedObjectsClientForSpaceId(
           osqueryContext,
           request
@@ -175,6 +176,6 @@ export const findSavedQueryRoute = (router: IRouter, osqueryContext: OsqueryAppC
             body: e,
           });
         }
-      }
+      })
     );
 };

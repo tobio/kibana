@@ -31,6 +31,7 @@ import { type IRouter, SavedObjectsErrorHelpers } from '@kbn/core/server';
 
 import { DEFAULT_SPACE_ID } from '@kbn/core-spaces-common';
 import { createInternalSavedObjectsClientForSpaceId } from '../../utils/get_internal_saved_object_client';
+import { withMissingSpaceHandler } from '../utils/with_missing_space_handler';
 import type {
   UpdatePacksRequestParamsSchema,
   UpdatePacksRequestBodySchema,
@@ -100,7 +101,7 @@ export const updatePackRoute = (router: IRouter, osqueryContext: OsqueryAppConte
           },
         },
       },
-      async (context, request, response) => {
+      withMissingSpaceHandler(async (context, request, response) => {
         const coreContext = await context.core;
         const esClient = coreContext.elasticsearch.client.asCurrentUser;
 
@@ -629,6 +630,6 @@ export const updatePackRoute = (router: IRouter, osqueryContext: OsqueryAppConte
         return response.ok({
           body: { data: buildResponseData() },
         });
-      }
+      })
     );
 };

@@ -12,6 +12,7 @@ import { PLUGIN_ID } from '../../../common';
 import type { OsqueryAppContext } from '../../lib/osquery_app_context_services';
 import type { SchemaService } from '../../lib/schema_service';
 import { createInternalSavedObjectsClientForSpaceId } from '../../utils/get_internal_saved_object_client';
+import { withMissingSpaceHandler } from '../utils/with_missing_space_handler';
 
 export const createGetSchemasRoute = (
   router: IRouter,
@@ -41,7 +42,7 @@ export const createGetSchemasRoute = (
           },
         },
       },
-      async (context, request, response) => {
+      withMissingSpaceHandler(async (context, request, response) => {
         try {
           const { schemaType } = request.params;
           const packageService = osqueryContext.service.getPackageService();
@@ -67,6 +68,6 @@ export const createGetSchemasRoute = (
             },
           });
         }
-      }
+      })
     );
 };

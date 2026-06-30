@@ -684,5 +684,42 @@ export default function ({ getService }: FtrProviderContext) {
         );
       });
     });
+
+    // Regression coverage for https://github.com/elastic/kibana/issues/275119:
+    // pack routes used to return 500 when the URL targeted a Kibana space that
+    // did not exist. They must return 404 instead.
+    describe('404 for non-existent space', () => {
+      const missingSpaceUrl = (suffix: string) =>
+        `/s/space-does-not-exist/api/osquery/packs${suffix}`;
+
+      it('returns 404 when finding packs in a non-existent space', async () => {
+        await withOsqueryHeaders(supertest.get(missingSpaceUrl(''))).expect(404);
+      });
+
+      it('returns 404 when reading a pack in a non-existent space', async () => {
+        await withOsqueryHeaders(supertest.get(missingSpaceUrl('/any-id'))).expect(404);
+      });
+
+      it('returns 404 when creating a pack in a non-existent space', async () => {
+        await withOsqueryHeaders(supertest.post(missingSpaceUrl('')))
+          .send(getDefaultPack({}))
+          .expect(404);
+      });
+
+      it('returns 404 when updating a pack in a non-existent space', async () => {
+        await withOsqueryHeaders(supertest.put(missingSpaceUrl('/any-id')))
+          .send({
+            name: 'Updated Pack',
+            description: 'Updated',
+            enabled: true,
+            queries: { q1: { query: 'select 1;', interval: 3600 } },
+          })
+          .expect(404);
+      });
+
+      it('returns 404 when deleting a pack in a non-existent space', async () => {
+        await withOsqueryHeaders(supertest.delete(missingSpaceUrl('/any-id'))).expect(404);
+      });
+    });
   });
 }

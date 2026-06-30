@@ -22,6 +22,7 @@ import type { OsqueryAppContext } from '../../lib/osquery_app_context_services';
 import type { PackQueryInput } from '../pack/utils';
 import { convertPackQueriesToSO } from '../pack/utils';
 import { createInternalSavedObjectsClientForSpaceId } from '../../utils/get_internal_saved_object_client';
+import { withMissingSpaceHandler } from '../utils/with_missing_space_handler';
 import { fetchOsqueryPackagePolicyIds } from '../utils';
 
 export const createStatusRoute = (router: IRouter, osqueryContext: OsqueryAppContext) => {
@@ -40,7 +41,7 @@ export const createStatusRoute = (router: IRouter, osqueryContext: OsqueryAppCon
         version: API_VERSIONS.internal.v1,
         validate: false,
       },
-      async (context, request, response) => {
+      withMissingSpaceHandler(async (context, request, response) => {
         const coreContext = await context.core;
         const esClient = coreContext.elasticsearch.client.asInternalUser;
         const spaceScopedClient = await createInternalSavedObjectsClientForSpaceId(
@@ -228,6 +229,6 @@ export const createStatusRoute = (router: IRouter, osqueryContext: OsqueryAppCon
         }
 
         return response.ok({ body: packageInfo });
-      }
+      })
     );
 };

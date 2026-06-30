@@ -18,6 +18,7 @@ import {
 } from '../../../common/constants';
 import type { OsqueryAppContext } from '../../lib/osquery_app_context_services';
 import { createInternalSavedObjectsClientForSpaceId } from '../../utils/get_internal_saved_object_client';
+import { withMissingSpaceHandler } from '../utils/with_missing_space_handler';
 import type {
   UnifiedHistoryRow,
   UnifiedHistoryResponse,
@@ -91,7 +92,7 @@ export const getUnifiedHistoryRoute = (router: IRouter, osqueryContext: OsqueryA
           },
         },
       },
-      async (context, request, response) => {
+      withMissingSpaceHandler(async (context, request, response) => {
         try {
           const coreContext = await context.core;
           const esClient = coreContext.elasticsearch.client.asInternalUser;
@@ -305,6 +306,6 @@ export const getUnifiedHistoryRoute = (router: IRouter, osqueryContext: OsqueryA
             body: { message: 'Failed to fetch query history' },
           });
         }
-      }
+      })
     );
 };
